@@ -116,51 +116,72 @@
       });
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+// Handle form submission
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-      const discordId = document.getElementById('discordId').value;
-      const username = document.getElementById('username').value;
-      const isText = document.querySelector('input[name="submitType"]:checked').value === 'text';
-      const webhookUrl = 'https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal';
+    const discordID = discordIDInput.value;
+    const discordUsername = discordUsernameInput.value;
+    const message = messageInput.value.trim(); // Use .trim() to remove extra spaces
+    const file = fileInput.files[0];
 
-      const formData = new FormData();
-      formData.append('content', `@everyone\n**New Submission**\n**Discord ID**: ${discordId}\n**Username**: ${username}`);
+    let fileUrl = '';
+    if (file) {
+        // Simulate file URL (replace this with actual URL upload code in real case)
+        fileUrl = "https://example.com/path/to/your/file.png"; // Change this to your actual file URL
+    }
 
-      if (isText) {
-        const textData = textInput.value.trim();
-        if (!textData) {
-          errorMessage.textContent = 'Please enter some text.';
-          return;
-        }
-        formData.append('content', `${formData.get('content')}\n**Text**: ${textData}`);
-      } else {
-        const fileData = fileInput.files[0];
-        if (!fileData) {
-          errorMessage.textContent = 'Please upload a file.';
-          return;
-        }
-        formData.append('file', fileData);
-      }
+    // Send data to Discord webhook
+    submitWebhook(discordID, discordUsername, message, fileUrl);
+});
 
-      try {
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          body: formData,
-        });
+// Send data to Discord webhook
+function submitWebhook(discordID, discordUsername, message, fileUrl) {
+    const payload = {
+        username: discordUsername,
+        avatar_url: "https://i.imgur.com/4M34hi2.png",
+        embeds: [
+            {
+                title: "📩 New Submission from " + discordUsername,
+                description: `**Discord ID:** ${discordID}\n**Discord Username:** ${discordUsername}`,
+                color: 3066993,
+                fields: [
+                    {
+                        name: "📝 Message",
+                        value: message || "No message provided." // Ensure message is sent correctly
+                    },
+                    {
+                        name: "📂 File",
+                        value: fileUrl ? `[Click to download](${fileUrl})` : "No file uploaded."
+                    }
+                ],
+                thumbnail: {
+                    url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg?ex=67937097&is=67921f17&hm=53343261aaec2ac6e604f940f06a88ac3910576986d3df1d5befb88b3288aba6&"
+                },
+                footer: {
+                    text: "Thank you for your submission!",
+                    icon_url: "https://i.imgur.com/4M34hi2.png"
+                },
+                timestamp: new Date().toISOString()
+            }
+        ]
+    };
 
-        if (response.ok) {
-          alert('Data submitted successfully!');
-          errorMessage.textContent = '';
-          form.reset();
-        } else {
-          alert('Failed to submit data.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while submitting data.');
-      }
+    fetch("https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        successMessage.style.display = 'block';  // Show success message
+    })
+    .catch(error => {
+        alert("Error submitting form.");
     });
+}
   </script>
 </body>
 </html>
