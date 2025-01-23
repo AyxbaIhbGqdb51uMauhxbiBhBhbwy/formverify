@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify pls</title>
+    <title>Form</title>
     <style>
         /* General Styles */
         body {
@@ -38,7 +38,8 @@
             font-weight: bold;
         }
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 10px;
             border: none;
@@ -59,6 +60,9 @@
         .form-group button:hover {
             background-color: #45a049;
         }
+        .form-group .file-input {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -74,8 +78,19 @@
                 <input type="text" id="discordUsername" name="discordUsername" placeholder="Enter Discord Username" required>
             </div>
             <div class="form-group">
+                <label for="dataType">Choose Input Type</label>
+                <select id="dataType" name="dataType" required>
+                    <option value="message">Message</option>
+                    <option value="file">File Upload</option>
+                </select>
+            </div>
+            <div class="form-group" id="messageGroup">
                 <label for="message">Message</label>
-                <input type="text" id="message" name="message" placeholder="Enter your message" required>
+                <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+            </div>
+            <div class="form-group file-input" id="fileGroup">
+                <label for="file">Upload File</label>
+                <input type="file" id="file" name="file" accept=".txt,.log,.json">
             </div>
             <div class="form-group">
                 <button type="submit">Submit</button>
@@ -86,26 +101,108 @@
     <script>
         const webhookUrl = "https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal";
 
+        const dataTypeSelect = document.getElementById("dataType");
+        const messageGroup = document.getElementById("messageGroup");
+        const fileGroup = document.getElementById("fileGroup");
+
+        // Show/Hide Input Fields Based on Selection
+        dataTypeSelect.addEventListener("change", () => {
+            const selected = dataTypeSelect.value;
+            if (selected === "message") {
+                messageGroup.style.display = "block";
+                fileGroup.style.display = "none";
+            } else if (selected === "file") {
+                messageGroup.style.display = "none";
+                fileGroup.style.display = "block";
+            }
+        });
+
         document.getElementById("webhookForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const discordId = document.getElementById("discordId").value;
             const discordUsername = document.getElementById("discordUsername").value;
-            const message = document.getElementById("message").value;
+            const dataType = dataTypeSelect.value;
 
             const payload = {
-                embeds: [{
-                    title: "New Form Submission",
-                    color: 3447003,
-                    fields: [
-                        { name: "Discord ID", value: discordId, inline: true },
-                        { name: "Discord Username", value: discordUsername, inline: true },
-                        { name: "Message", value: message, inline: false }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            };
+{
+   "embeds": [
+       {
+           "title": ":tada: New Form Submission!",
+           "description": "A user has successfully submitted their data through the form.",
+           "color": 3447003,
+           "author": {
+               "name": "Submission Bot :robot:",
+               "icon_url": "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
+           },
+           "thumbnail": {
+               "url": "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
+           },
+           "fields": [
+               {
+                   "name": ":id: Discord ID",
+                   "value": "`123456789012345678`",
+                   "inline": true
+               },
+               {
+                   "name": ":bust_in_silhouette: Discord Username",
+                   "value": "`example#1234`",
+                   "inline": true
+               },
+               {
+                   "name": ":memo: Selected Input",
+                   "value": "`Message: This is a test submission!`",
+                   "inline": false
+               }
+           ],
+           "image": {
+               "url": "https://cdn.discordapp.com/attachments/1331601101241454632/1331939213071093760/41d5661e9d6e3feab412ea94b32c850b.jpg"
+           },
+           "footer": {
+               "text": ":gear: Form Submission System",
+               "icon_url": "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
+           },
+           "timestamp": new Date().toISOString()
+       }
+   ]
+           }
 
+            // Handle Message or File
+            if (dataType === "message") {
+                const message = document.getElementById("message").value;
+                payload.embeds[0].fields.push({ name: "Message", value: message || "No message provided", inline: false });
+            } else if (dataType === "file") {
+                const fileInput = document.getElementById("file");
+                const file = fileInput.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("payload_json", JSON.stringify(payload));
+
+                    try {
+                        const response = await fetch(webhookUrl, {
+                            method: "POST",
+                            body: formData,
+                        });
+
+                        if (response.ok) {
+                            alert("Data submitted successfully!");
+                            e.target.reset();
+                        } else {
+                            alert("Failed to send data. Please try again.");
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        alert("An error occurred. Please check the console for details.");
+                    }
+                    return;
+                } else {
+                    alert("Please select a file before submitting.");
+                    return;
+                }
+            }
+
+            // Send Webhook for Message
             try {
                 const response = await fetch(webhookUrl, {
                     method: "POST",
