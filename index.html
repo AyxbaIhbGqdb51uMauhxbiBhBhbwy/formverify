@@ -124,34 +124,32 @@
       const isText = document.querySelector('input[name="submitType"]:checked').value === 'text';
       const webhookUrl = 'https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal';
 
-      let messageContent = `@everyone\n**New Submission**\n**Discord ID**: ${discordId}\n**Username**: ${username}`;
+      const formData = new FormData();
+      formData.append('content', `@everyone\n**New Submission**\n**Discord ID**: ${discordId}\n**Username**: ${username}`);
 
+      // Check if text is selected
       if (isText) {
         const textData = textInput.value.trim();
         if (!textData) {
           errorMessage.textContent = 'Please enter some text.';
           return;
         }
-        messageContent += `\n**Text**: ${textData}`;
-      } else {
+        formData.append('content', `${formData.get('content')}\n**Text**: ${textData}`);
+      } 
+      // If file is selected, append the file
+      else {
         const fileData = fileInput.files[0];
         if (!fileData) {
           errorMessage.textContent = 'Please upload a file.';
           return;
         }
-        // File data is not handled directly in message body but should be uploaded separately if needed.
-        messageContent += `\n**File Uploaded**: ${fileData.name}`;
+        formData.append('file', fileData);
       }
 
       try {
         const response = await fetch(webhookUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            content: messageContent
-          })
+          body: formData,
         });
 
         if (response.ok) {
