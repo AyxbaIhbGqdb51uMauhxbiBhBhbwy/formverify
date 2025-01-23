@@ -22,6 +22,7 @@
             padding: 20px;
             border-radius: 10px;
             width: 400px;
+            box-sizing: border-box;
         }
 
         h2 {
@@ -31,6 +32,7 @@
 
         .form-group {
             margin-bottom: 15px;
+            width: 100%;
         }
 
         label {
@@ -46,6 +48,7 @@
             border: 1px solid #444;
             border-radius: 5px;
             color: #fff;
+            box-sizing: border-box;
         }
 
         button {
@@ -58,6 +61,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            box-sizing: border-box;
         }
 
         button:hover {
@@ -157,26 +161,12 @@
 
         let fileUrl = '';
         if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            // Handle file upload (Example using FormData)
-            fetch('/upload', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                fileUrl = data.fileUrl;  // Assume response has fileUrl
-                submitWebhook(discordID, discordUsername, message, fileUrl);
-            })
-            .catch(error => {
-                console.error('Error uploading file:', error);
-                submitWebhook(discordID, discordUsername, message, fileUrl);
-            });
-        } else {
-            submitWebhook(discordID, discordUsername, message, fileUrl);
+            // Simulate file URL (in a real-world scenario, you would upload the file somewhere and get the URL)
+            fileUrl = URL.createObjectURL(file);
         }
+
+        // Send data to Discord webhook
+        submitWebhook(discordID, discordUsername, message, fileUrl);
     });
 
     // Send data to Discord webhook
