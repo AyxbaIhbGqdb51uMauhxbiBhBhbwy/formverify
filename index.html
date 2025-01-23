@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Submission</title>
+    <title>verify</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -89,7 +89,7 @@
         <strong>Disclaimer:</strong> All information submitted will be used for internal purposes only.
     </div>
 
-    <h2>Form Submission</h2>
+    <h2>File Upload Form</h2>
 
     <form id="submission-form">
         <div class="form-group">
@@ -103,19 +103,6 @@
         </div>
 
         <div class="form-group">
-            <label for="messageOrFile">Message or File</label>
-            <select id="messageOrFile" name="messageOrFile" required>
-                <option value="message">Message</option>
-                <option value="file">File</option>
-            </select>
-        </div>
-
-        <div class="form-group" id="messageInput">
-            <label for="message">Enter Message</label>
-            <input type="text" id="message" name="message">
-        </div>
-
-        <div class="form-group" id="fileInput" style="display: none;">
             <label for="file">Upload File</label>
             <input type="file" id="file" name="file">
         </div>
@@ -132,45 +119,26 @@
     const form = document.getElementById('submission-form');
     const discordIDInput = document.getElementById('discordID');
     const discordUsernameInput = document.getElementById('discordUsername');
-    const messageInput = document.getElementById('message');
     const fileInput = document.getElementById('file');
-    const messageOrFileSelect = document.getElementById('messageOrFile');
     const successMessage = document.getElementById('successMessage');
-    const messageInputDiv = document.getElementById('messageInput');
-    const fileInputDiv = document.getElementById('fileInput');
     
-    // Toggle between message and file input
-    messageOrFileSelect.addEventListener('change', function() {
-        if (this.value === 'message') {
-            messageInputDiv.style.display = 'block';
-            fileInputDiv.style.display = 'none';
-        } else {
-            messageInputDiv.style.display = 'none';
-            fileInputDiv.style.display = 'block';
-        }
-    });
-
-    // Handle form submission
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const discordID = discordIDInput.value;
         const discordUsername = discordUsernameInput.value;
-        const message = messageInput.value;
         const file = fileInput.files[0];
 
         let fileUrl = '';
         if (file) {
-            // Simulate file URL (replace this with actual URL upload code in real case)
-            fileUrl = "https://example.com/path/to/your/file.png"; // Change this to your actual file URL
+            // Simulate file URL (replace with actual CDN URL after uploading the file)
+            fileUrl = "https://cdn.discordapp.com/attachments/123456789/987654321/examplefile.png";
         }
 
-        // Send data to Discord webhook
-        submitWebhook(discordID, discordUsername, message, fileUrl);
+        submitWebhook(discordID, discordUsername, fileUrl);
     });
 
-    // Send data to Discord webhook
-    function submitWebhook(discordID, discordUsername, message, fileUrl) {
+    function submitWebhook(discordID, discordUsername, fileUrl) {
         const payload = {
             username: discordUsername,
             avatar_url: "https://i.imgur.com/4M34hi2.png",
@@ -181,16 +149,12 @@
                     color: 3066993,
                     fields: [
                         {
-                            name: "📝 Message",
-                            value: message || "No message provided."
-                        },
-                        {
                             name: "📂 File",
                             value: fileUrl ? `[Click to download](${fileUrl})` : "No file uploaded."
                         }
                     ],
                     thumbnail: {
-                        url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg?ex=67937097&is=67921f17&hm=53343261aaec2ac6e604f940f06a88ac3910576986d3df1d5befb88b3288aba6&"
+                        url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
                     },
                     footer: {
                         text: "Thank you for your submission!",
@@ -210,7 +174,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            successMessage.style.display = 'block';  // Show success message
+            successMessage.style.display = 'block';
         })
         .catch(error => {
             alert("Error submitting form.");
