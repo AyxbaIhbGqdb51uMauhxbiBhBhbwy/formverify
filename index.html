@@ -3,167 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Verify Form</title>
+    <title>Form Submission</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            padding: 0;
         }
-        form {
-            background: #1e1e1e;
+
+        .container {
+            background-color: #2c2f38;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
+            width: 400px;
         }
+
+        h2 {
+            color: #ff4040;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
         label {
+            font-size: 16px;
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
         }
-        input, textarea, select, button {
+
+        input[type="text"], input[type="file"], select {
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px;
+            background-color: #3a3f47;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
             border: none;
             border-radius: 5px;
-            outline: none;
-            font-size: 1rem;
-        }
-        input, textarea, select {
-            background: #2b2b2b;
-            color: #e0e0e0;
-        }
-        button {
-            background: #6200ea;
             color: white;
+            font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
-            background: #3700b3;
+            background-color: #45a049;
+        }
+
+        .disclaimer {
+            color: #ff4040;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            color: #4CAF50;
         }
     </style>
 </head>
 <body>
-    <form id="submissionForm">
-        <label for="discordID">Discord ID:</label>
-        <input type="text" id="discordID" name="discordID" placeholder="Enter your Discord ID" required>
 
-        <label for="discordUsername">Discord Username:</label>
-        <input type="text" id="discordUsername" name="discordUsername" placeholder="Enter your Discord Username" required>
+<div class="container">
+    <div class="disclaimer">
+        <strong>Disclaimer:</strong> All information submitted will be used for internal purposes only.
+    </div>
 
-        <label for="inputType">Choose Input Type:</label>
-        <select id="inputType" name="inputType" required>
-            <option value="message">Message</option>
-            <option value="file">File Upload</option>
-        </select>
+    <h2>Form Submission</h2>
 
-        <div id="messageInput">
-            <label for="message">Message:</label>
-            <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+    <form id="submission-form">
+        <div class="form-group">
+            <label for="discordID">Discord ID</label>
+            <input type="text" id="discordID" name="discordID" required>
         </div>
 
-        <div id="fileInput" style="display: none;">
-            <label for="file">File Upload:</label>
+        <div class="form-group">
+            <label for="discordUsername">Discord Username</label>
+            <input type="text" id="discordUsername" name="discordUsername" required>
+        </div>
+
+        <div class="form-group">
+            <label for="messageOrFile">Message or File</label>
+            <select id="messageOrFile" name="messageOrFile" required>
+                <option value="message">Message</option>
+                <option value="file">File</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="messageInput">
+            <label for="message">Enter Message</label>
+            <input type="text" id="message" name="message">
+        </div>
+
+        <div class="form-group" id="fileInput" style="display: none;">
+            <label for="file">Upload File</label>
             <input type="file" id="file" name="file">
         </div>
 
         <button type="submit">Submit</button>
     </form>
 
-    <script>
-        const webhookUrl = "https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal";
+    <div class="success-message" id="successMessage">
+        <p>Form Submitted Successfully!</p>
+    </div>
+</div>
 
-        document.getElementById("submissionForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+<script>
+    const form = document.getElementById('submission-form');
+    const discordIDInput = document.getElementById('discordID');
+    const discordUsernameInput = document.getElementById('discordUsername');
+    const messageInput = document.getElementById('message');
+    const fileInput = document.getElementById('file');
+    const messageOrFileSelect = document.getElementById('messageOrFile');
+    const successMessage = document.getElementById('successMessage');
+    const messageInputDiv = document.getElementById('messageInput');
+    const fileInputDiv = document.getElementById('fileInput');
+    
+    // Toggle between message and file input
+    messageOrFileSelect.addEventListener('change', function() {
+        if (this.value === 'message') {
+            messageInputDiv.style.display = 'block';
+            fileInputDiv.style.display = 'none';
+        } else {
+            messageInputDiv.style.display = 'none';
+            fileInputDiv.style.display = 'block';
+        }
+    });
 
-            const discordID = document.getElementById("discordID").value;
-            const discordUsername = document.getElementById("discordUsername").value;
-            const inputType = document.getElementById("inputType").value;
-            let inputValue;
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            if (inputType === "message") {
-                inputValue = document.getElementById("message").value || "No message provided.";
-            } else {
-                const fileInput = document.getElementById("file");
-                inputValue = fileInput.files[0] ? fileInput.files[0].name : "No file uploaded.";
-            }
+        const discordID = discordIDInput.value;
+        const discordUsername = discordUsernameInput.value;
+        const message = messageInput.value;
+        const file = fileInput.files[0];
 
-            const embed = {
-                embeds: [
-                    {
-                        title: ":tada: New Form Submission!",
-                        description: "A user has successfully submitted their data through the form.",
-                        color: 3447003,
-                        author: {
-                            name: "Submission Bot :robot:",
-                            icon_url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
-                        },
-                        thumbnail: {
-                            url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
-                        },
-                        fields: [
-                            {
-                                name: ":id: Discord ID",
-                                value: `\`${discordID}\``,
-                                inline: true
-                            },
-                            {
-                                name: ":bust_in_silhouette: Discord Username",
-                                value: `\`${discordUsername}\``,
-                                inline: true
-                            },
-                            {
-                                name: inputType === "message" ? ":memo: Message" : ":file_folder: File Upload",
-                                value: `\`${inputValue}\``,
-                                inline: false
-                            }
-                        ],
-                        image: {
-                            url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939213071093760/41d5661e9d6e3feab412ea94b32c850b.jpg"
-                        },
-                        footer: {
-                            text: ":gear: Form Submission System",
-                            icon_url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg"
-                        },
-                        timestamp: new Date().toISOString()
-                    }
-                ]
-            };
+        let fileUrl = '';
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
 
-            fetch(webhookUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(embed)
+            // Handle file upload (Example using FormData)
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
             })
-            .then(response => {
-                if (response.ok) {
-                    alert("Form submitted successfully!");
-                } else {
-                    alert("Failed to submit form.");
-                }
+            .then(response => response.json())
+            .then(data => {
+                fileUrl = data.fileUrl;  // Assume response has fileUrl
+                submitWebhook(discordID, discordUsername, message, fileUrl);
             })
             .catch(error => {
-                console.error("Error:", error);
+                console.error('Error uploading file:', error);
+                submitWebhook(discordID, discordUsername, message, fileUrl);
             });
-        });
+        } else {
+            submitWebhook(discordID, discordUsername, message, fileUrl);
+        }
+    });
 
-        document.getElementById("inputType").addEventListener("change", function () {
-            const inputType = this.value;
-            document.getElementById("messageInput").style.display = inputType === "message" ? "block" : "none";
-            document.getElementById("fileInput").style.display = inputType === "file" ? "block" : "none";
+    // Send data to Discord webhook
+    function submitWebhook(discordID, discordUsername, message, fileUrl) {
+        const payload = {
+            username: discordUsername,
+            avatar_url: "https://i.imgur.com/4M34hi2.png",
+            embeds: [
+                {
+                    title: "📩 New Submission from " + discordUsername,
+                    description: `**Discord ID:** ${discordID}\n**Discord Username:** ${discordUsername}`,
+                    color: 3066993,
+                    fields: [
+                        {
+                            name: "📝 Message",
+                            value: message || "No message provided."
+                        },
+                        {
+                            name: "📂 File",
+                            value: fileUrl ? `[Click to download](${fileUrl})` : "No file uploaded."
+                        }
+                    ],
+                    thumbnail: {
+                        url: "https://cdn.discordapp.com/attachments/1331601101241454632/1331939249225859122/d41ec5a09270c962e211b2d53753bc21.jpg?ex=67937097&is=67921f17&hm=53343261aaec2ac6e604f940f06a88ac3910576986d3df1d5befb88b3288aba6&"
+                    },
+                    footer: {
+                        text: "Thank you for your submission!",
+                        icon_url: "https://i.imgur.com/4M34hi2.png"
+                    },
+                    timestamp: new Date().toISOString()
+                }
+            ]
+        };
+
+        fetch("https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            successMessage.style.display = 'block';  // Show success message
+        })
+        .catch(error => {
+            alert("Error submitting form.");
         });
-    </script>
+    }
+</script>
+
 </body>
 </html>
