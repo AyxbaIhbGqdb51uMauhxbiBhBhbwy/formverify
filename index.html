@@ -3,165 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Submission Form</title>
+  <title>Modern Dark Form</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      text-align: center;
-      padding: 2em;
+      background: #1e1e2f;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.5em;
+
+    .form-container {
+      background: #2a2a3d;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      width: 400px;
     }
-    form {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      display: inline-block;
-      max-width: 400px;
-      width: 100%;
+
+    .disclaimer {
+      background: #39394f;
+      padding: 10px 15px;
+      border-left: 4px solid #6c63ff;
+      margin-bottom: 20px;
+      font-size: 14px;
+      border-radius: 6px;
     }
-    label {
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
       display: block;
-      margin: 10px 0 5px;
-      font-size: 1em;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 14px;
     }
-    input[type="text"], input[type="file"], input[type="radio"] {
-      width: calc(100% - 20px);
+
+    .form-group input[type="text"],
+    .form-group textarea {
+      width: 100%;
+      background: #1f1f2e;
+      color: #f5f5f5;
+      border: 1px solid #444;
+      border-radius: 8px;
       padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: none;
-      font-size: 1em;
+      font-size: 14px;
     }
-    input[type="file"] {
-      background: #2c5364;
-      color: white;
+
+    .form-group input[type="file"] {
+      padding: 5px;
+      background: #1f1f2e;
+      color: #f5f5f5;
+      border: 1px solid #444;
+      border-radius: 8px;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 1em;
+
+    .form-group button {
+      width: 100%;
+      background: #6c63ff;
+      color: #fff;
       border: none;
-      border-radius: 5px;
-      background: #4caf50;
-      color: white;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 16px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
     }
-    button:hover {
-      background: #45a049;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-    }
-    .hidden {
-      display: none;
+
+    .form-group button:hover {
+      background: #574fd3;
     }
   </style>
 </head>
 <body>
-  <h1>Submit Your Data</h1>
-  <form id="submissionForm">
-    <p class="error" id="errorMessage"></p>
-
-    <!-- Discord User ID -->
-    <label for="discordId">Discord User ID</label>
-    <input type="text" id="discordId" placeholder="Enter your Discord User ID" required>
-
-    <!-- Username -->
-    <label for="username">Username</label>
-    <input type="text" id="username" placeholder="Enter your username" required>
-
-    <!-- Choice Between Text or File -->
-    <label>Submit as:</label>
-    <label><input type="radio" name="submitType" value="text" checked> Text</label>
-    <label><input type="radio" name="submitType" value="file"> File</label>
-
-    <!-- Text Input -->
-    <input type="text" id="textInput" placeholder="Enter your text" class="hidden">
-
-    <!-- File Input -->
-    <input type="file" id="fileInput" class="hidden">
-
-    <!-- Submit Button -->
-    <button type="submit">Submit</button>
-  </form>
+  <div class="form-container">
+    <div class="disclaimer">
+      <p><strong>Disclaimer:</strong> You must send at least one source file for verifying.</p>
+    </div>
+    <form id="webhookForm">
+      <div class="form-group">
+        <label for="userid">User ID</label>
+        <input type="text" id="userid" name="userid" placeholder="Enter your User ID" required>
+      </div>
+      <div class="form-group">
+        <label for="discord_username">Discord Username</label>
+        <input type="text" id="discord_username" name="discord_username" placeholder="Enter your Discord Username" required>
+      </div>
+      <div class="form-group">
+        <label for="api">Share API</label>
+        <textarea id="api" name="api" rows="3" placeholder="Enter API details"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="file">Source File</label>
+        <input type="file" id="file" name="file" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
 
   <script>
-    const form = document.getElementById('submissionForm');
-    const errorMessage = document.getElementById('errorMessage');
-    const textInput = document.getElementById('textInput');
-    const fileInput = document.getElementById('fileInput');
-    const radioButtons = document.querySelectorAll('input[name="submitType"]');
+    document.getElementById("webhookForm").addEventListener("submit", async function (e) {
+      e.preventDefault(); // Prevent form from refreshing
 
-    // Toggle between text and file inputs
-    radioButtons.forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (radio.value === 'text') {
-          textInput.classList.remove('hidden');
-          textInput.required = true;
-          fileInput.classList.add('hidden');
-          fileInput.required = false;
-        } else {
-          fileInput.classList.remove('hidden');
-          fileInput.required = true;
-          textInput.classList.add('hidden');
-          textInput.required = false;
-        }
-      });
-    });
+      // Webhook URL
+      const webhookURL = "https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal";
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+      // Collect form data
+      const userid = document.getElementById("userid").value;
+      const discordUsername = document.getElementById("discord_username").value;
+      const api = document.getElementById("api").value;
+      const fileInput = document.getElementById("file").files[0];
 
-      const discordId = document.getElementById('discordId').value;
-      const username = document.getElementById('username').value;
-      const isText = document.querySelector('input[name="submitType"]:checked').value === 'text';
-      const webhookUrl = 'https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal';
-
-      const formData = new FormData();
-      formData.append('content', `@everyone\n**New Submission**\n**Discord ID**: ${discordId}\n**Username**: ${username}`);
-
-      // Check if text is selected
-      if (isText) {
-        const textData = textInput.value.trim();
-        if (!textData) {
-          errorMessage.textContent = 'Please enter some text.';
-          return;
-        }
-        formData.append('content', `${formData.get('content')}\n**Text**: ${textData}`);
-      } 
-      // If file is selected, append the file
-      else {
-        const fileData = fileInput.files[0];
-        if (!fileData) {
-          errorMessage.textContent = 'Please upload a file.';
-          return;
-        }
-        formData.append('file', fileData);
+      // Check if a file is selected
+      if (!fileInput) {
+        alert("Please upload a source file.");
+        return;
       }
 
-      try {
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          body: formData,
-        });
+      // Prepare form data for file upload
+      const formData = new FormData();
+      formData.append("file", fileInput);
 
-        if (response.ok) {
-          alert('Data submitted successfully!');
-          errorMessage.textContent = '';
-          form.reset();
-        } else {
-          alert('Failed to submit data.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while submitting data.');
+      // Upload file to Discord
+      const fileResponse = await fetch(webhookURL, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!fileResponse.ok) {
+        alert("Failed to upload file. Please try again.");
+        return;
+      }
+
+      // Send other data as JSON
+      const dataPayload = {
+        content: `**New Submission**\n\n**User ID:** ${userid}\n**Discord Username:** ${discordUsername}\n**API Details:**\n\`\`\`\n${api}\n\`\`\``,
+      };
+
+      const response = await fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataPayload),
+      });
+
+      if (response.ok) {
+        alert("Data submitted successfully!");
+      } else {
+        alert("Failed to send data. Please try again.");
       }
     });
   </script>
